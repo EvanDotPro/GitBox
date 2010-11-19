@@ -1,0 +1,63 @@
+#! /bin/bash
+optiontext="Usage: ./dropbox start|stop|restart|status"
+if [ ! "$1" ]; then
+    echo $optiontext
+    exit
+fi
+
+if [ "$2" ]; then
+    dbpath=$2
+else
+    dbpath="/srv/dropbox"
+fi
+
+dropbox_status() {
+    myvar=$(screen -ls | grep dropbox)
+    if [ "$myvar" ]; then
+        echo "running"
+    else
+        echo "stopped"
+    fi
+}
+
+dropbox_pid() {
+    echo $(ps aux | grep dropbox | grep python | tr -s ' ' | cut -d' ' -f 2)
+}
+
+dropbox_start() {
+    if [ $(dropbox_status) == "running" ]; then
+        echo "The dropbox daemon is already running!"
+        exit
+    fi
+    echo -n "Starting the dropbox daemon... "
+    screen -dmS dropbox /srv/dropbox/scripts/dropbox.py $dbpath
+    echo "DONE!"
+}
+
+dropbox_stop() {
+    if [ $(dropbox_status) == "stopped" ]; then
+        echo "The dropbox daemon is not running!"
+        exit
+    fi
+    echo -n "Stopping the dropbox daemon... "
+    kill $(dropbox_pid)
+    echo "DONE!"
+}
+
+if [ "$1" == "start" ]; then
+    dropbox_start
+    exit
+fi
+
+if [ "$1" == "stop" ]; then
+    dropbox_stop
+    exit
+fi
+
+if [ "$1" == "restart" ]; then
+    dropbox_stop
+    dropbox_start
+    exit
+fi
+
+echo $optiontext

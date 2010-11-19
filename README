@@ -1,0 +1,4 @@
+This basically allows you to have the functionality of Dropbox, combined with the power of Git that you can host yourself instead of trusting a third party with your files. This will only work on Linux (the install script is for Fedora 14), but I welcome efforts to add Windows/Mac support.
+
+
+More documentation coming soon.

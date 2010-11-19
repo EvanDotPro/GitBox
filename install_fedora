@@ -1,0 +1,34 @@
+#! /bin/bash
+
+# Make sure we're on Fedora 14
+if [ $(cat /etc/redhat-release | grep "Fedora release 14" | wc -l) == 0 ];then
+    echo "Sorry, this script is only for Fedora 14"
+    exit
+fi
+
+# Get root permissions if we don't have them
+if [ $(whoami) != "root" ];then
+    echo "I need root privileges, please."
+    su -c "$0"
+    exit
+fi
+
+# Dependencies for GitBox
+yum -y install python-inotify screen
+
+# Dependencies for compiling patched Git
+yum -y install git python-devel curl-devel expat-devel perl-ExtUtils-MakeMaker zlib-devel openssl-devel gcc make
+
+# Patch and compile Git as "Get"
+rm -rfv /opt/get
+git clone git://git.kernel.org/pub/scm/git/git.git /tmp/gitcustom
+cd /tmp/gitcustom
+git checkout v1.7.3.2
+find . -name '*.c' -type f -exec sed -i 's/\.git\([\"\/]\)/\.get\1/g' {} \;
+find . -name '*.h' -type f -exec sed -i 's/\.git\([\"\/]\)/\.get\1/g' {} \;
+find . -name '*.c' -type f -exec sed -i 's/\.gitignore/\.getignore/g' {} \;
+find . -name '*.c' -type f -exec sed -i "s/!= 'i')/!= 'e')/g" {} \;
+make prefix=/opt/get
+make install prefix=/opt/get
+cd ~
+rm -rfv /tmp/gitcustom
