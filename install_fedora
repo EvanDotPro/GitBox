@@ -32,3 +32,21 @@ make prefix=/opt/get
 make install prefix=/opt/get
 cd ~
 rm -rfv /tmp/gitcustom
+
+# Increase maximum inotify subscriptions
+echo 1000000 | tee /proc/sys/fs/inotify/max_user_watches
+echo "echo 1000000 | tee /proc/sys/fs/inotify/max_user_watches" >> /etc/rc.local
+
+# Cloning the remote GitBox
+echo -e "\n\n\n----NEXT STEPS----\n\n\nOn a server, create a directory (maybe ~/GitBox/), cd into that directory,
+and run:\ngit --bare init\n\nMake sure you have public key authentication working from your machine to the
+server. When you are done with that step, enter the clone URL to your GitBox repository below (ex:
+ssh://username@hostname:port/path/to/GitBox):\n\n"
+echo -n "Please enter the clone URL for your GitBox: " 
+read gitbox
+echo -n "Please enter the local path for your GitBox (ex: /srv/gitbox): "
+read localgitbox
+/opt/get/bin/git clone $gitbox $localgitbox
+chown -R $USERNAME:$USERNAME $localgitbox
+
+echo -e "\n\n\n----INSTALLATION COMPLETE----\n\n\nYou can now start the daemon using the provided init script."
