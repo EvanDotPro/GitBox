@@ -30,7 +30,7 @@ dropbox_start() {
         exit
     fi
     echo -n "Starting the dropbox daemon... "
-    screen -dmS dropbox /srv/dropbox/scripts/dropbox.py $dbpath
+    screen -dmS dropbox /srv/dropbox/scripts/GitBox/dropbox.py $dbpath
     echo "DONE!"
 }
 
